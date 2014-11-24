@@ -76,11 +76,37 @@ class MyMembre extends membre
     $sql = new sql();
     $query = $sql->sql_query("SELECT * FORM membre WHERE Prenom = ". $sql->quote($prenom) . " LIMIT 1");
     
-    $membre = $sql->sql_fetch_object($query);
+    $membre = $sql->sql_fetch_object($query, "ORM\\membre");
     return $membre;
   }
 }
 ```
+
+## Usage MVC
+
+Nous ne somme pas les auteurs du système de MVC mais il n'est actuellement plus disponible. Nous l'avons adapté au moteur de template et à l'ORM.
+Comme mentionné tout en haut le MVC marche avec l'URL rewiting. Vous devez absolument l'avoir activé. Ainsi le framework intègre des URL plus SEO-friendly comme par exemple : http://www.exemple.com/membre/profil/2. 
+
+La syntaxe de l'URL est simple et pratique:
+- "http://www.exemple.com" est votre nom de domaine.
+- "/membre" est le nom de la class dans la couche controlleur (dossier controller).
+- "/profil" est la function dans la class membre.
+- "/2" est un des arguments de la function profil().
+
+Vous pouvez cumuler jusqu'a 4 arguments, par exemple http://www.exemple.com/membre/profil/2/Martin/Marc/Stagiaire est égale à : 
+```php
+membre->profil(2, "Martin", "Marc", "Stagiaire");
+```
+
+## Installation
+
+Téléchargez ou clonez le GIT.
+
+```sh
+$ git clone https://github.com/xtuc/MyORM-Micro-framework.git
+```
+
+Le framework ne require pas d'installation spécifique.
 
 ## Configuration minimum requise
 
