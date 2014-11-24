@@ -113,26 +113,5 @@ public function __get( $property )
         parent::save($transaction);
         $this->Entityspecificity_Entity = null;
     }
-
-    static function GetByFBID($FB_ID = 0)
-    {
-    	$sql = $GLOBALS["sql"];
-    	
-    	$Query = "SELECT * FROM entity WHERE FB_ID = " . $sql->quote($FB_ID) ."";
-    	$Result = $sql->sql_query($Query);
-    	 
-    	if ($myentity = $sql->sql_fetch_object($Result,"ORM\\entity"))
-    	{
-    		return $myentity;
-    	}
-    	
-    	return NULL;
-    }
-
-    function get_sql()
-    {
-        return $GLOBALS["sql"];
-    }
-
 }
 ?>
