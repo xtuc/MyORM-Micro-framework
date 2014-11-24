@@ -32,10 +32,10 @@ define('URL', "http://" . $_SERVER["HTTP_HOST"] . $dir);
  */
 
 define('DB_TYPE', 'mysql');
-define('DB_HOST', 'xtuc.fr');
-define('DB_NAME', 'ORM_test_unit');
-define('DB_USER', 'root');
-define('DB_PASS', '2rIhIzVpluAwJGslw2Vs'); 
+define('DB_HOST', 'localhost');
+define('DB_NAME', 'site');
+define('DB_USER', 'site');
+define('DB_PASS', 'secret'); 
 
 /**
  * Configuration for: Views
