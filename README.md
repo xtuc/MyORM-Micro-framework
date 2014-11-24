@@ -20,6 +20,9 @@ define('DB_USER', 'site');
 define('DB_PASS', 'secret'); 
 ```
 
+##### Configurations additionnels :
+- "DB_CHARSET" permet de choisir l'encodage SQL, "UTF8" par défault.
+
 ## Usage ORM
 
 Voici la table "membre" notre base de données :
