@@ -106,7 +106,7 @@ Téléchargez ou clonez le GIT.
 $ git clone https://github.com/xtuc/MyORM-Micro-framework.git
 ```
 
-Le framework ne require pas d'installation spécifique.
+Le framework require un accès en écriture sur le dossier /application/libs/DAL.
 
 ## Configuration minimum requise
 
