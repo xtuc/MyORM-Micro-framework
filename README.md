@@ -112,4 +112,4 @@ L'ORM require PHP 5 >= 5.3.0 a cause de l'utilisation des namespaces notament.
 
 ## Auteurs
 - Renaud PLATEL
-- Sven SAULEAU
+- Sven SAULEAU (@xtuc)
