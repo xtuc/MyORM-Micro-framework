@@ -27,15 +27,13 @@ define('DB_PASS', 'secret');
 
 Voici la table "membre" notre base de données :
 
-```
-ID       Nom       Prenom 
--------  --------  ---------- 
-      1  DUPONT    Alain 
-      2  MARTIN    Marc
-      3  BOUVIER   Alain
-      4  DUBOIS    Paul
-      5  DREYFUS   Jean 
-```
+ID|Nom|Prenom 
+-------|--------|---------- 
+1|DUPONT|Alain 
+2|MARTIN|Marc
+3|BOUVIER|Alain
+4|DUBOIS|Paul
+5|DREYFUS|Jean 
 
 Imaginons que vous souhaitiez le nom du membre n°2.
 
