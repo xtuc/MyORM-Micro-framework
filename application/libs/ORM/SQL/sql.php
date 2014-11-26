@@ -118,18 +118,6 @@ class sql
 			$this->sql_error($Exception);
 		}
 		
-		/**
-		 * DEMO ONLY
-		 */
-		global $sqlStats;
-		
-		if(empty($sqlStats) || !is_array($sqlStats))
-		{
-			$sqlStats = array();
-		}
-		
-		$sqlStats[] = $query;
-		
 		return $Results;
 	}
 	

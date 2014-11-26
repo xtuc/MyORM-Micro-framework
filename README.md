@@ -5,7 +5,7 @@ Fonctionnalités du framework :
 - Un MVC utilisant l'url rewriting très facile à utiliser.
 - Un moteur de template : Twig composant de Symfony2 ([Twig sensiolabs](http://twig.sensiolabs.org/))
 
-[Site de démonstration](http://orm.sandbox.xtuc.net/)
+[Site de démonstration](http://MyORM.xtuc.net/)
 
 ## Configuration
 
