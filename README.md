@@ -27,15 +27,13 @@ define('DB_PASS', 'secret');
 
 Voici la table "membre" notre base de données :
 
-```
-ID       Nom       Prenom 
--------  --------  ---------- 
-      1  DUPONT    Alain 
-      2  MARTIN    Marc
-      3  BOUVIER   Alain
-      4  DUBOIS    Paul
-      5  DREYFUS   Jean 
-```
+ID|Nom|Prenom 
+-------|--------|---------- 
+1|DUPONT|Alain 
+2|MARTIN|Marc
+3|BOUVIER|Alain
+4|DUBOIS|Paul
+5|DREYFUS|Jean 
 
 Imaginons que vous souhaitiez le nom du membre n°2.
 
@@ -106,7 +104,7 @@ Téléchargez ou clonez le GIT.
 $ git clone https://github.com/xtuc/MyORM-Micro-framework.git
 ```
 
-Le framework ne require pas d'installation spécifique.
+Le framework require un accès en écriture sur le dossier /application/libs/DAL.
 
 ## Configuration minimum requise
 
@@ -114,4 +112,4 @@ L'ORM require PHP 5 >= 5.3.0 a cause de l'utilisation des namespaces notament.
 
 ## Auteurs
 - Renaud PLATEL
-- Sven SAULEAU
+- Sven SAULEAU (@xtuc)
