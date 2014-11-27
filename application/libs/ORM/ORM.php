@@ -9,7 +9,7 @@ class ORM {
 	/**
 	 * Version à deux caracteres sinon l'__autoloader ne marche pas
 	 */
-	const version = 1.4;
+	const version = 1.5;
 	
 	private $localmode = 0;
 	private $ScreenError = 1;
@@ -222,8 +222,8 @@ class $class extends Common
 	// **********************
 	
 	protected \$Database; // Database for this object
-	public \$isNew; // Memory for insert
-	protected \$isToSaveOrToUpdate; // Memory for update
+	public \$isNew = 0; // Memory for insert
+	protected \$isToSaveOrToUpdate = 0; // Memory for update
 	//Memory array of fields for update
 	private \$structure = array(
 		";
@@ -243,65 +243,42 @@ class $class extends Common
 	// **********************
 	// Constructor
 	// **********************
-	function __construct (\$id = null, \$database = null)
+	function __construct (\$val = null, \$property = self::primary_key, \$database = null)
 	{
 		if (is_null(\$database))
 		{
-		    \$this->Database = parent::sql(SQL::read)->Database;
+		    \$this->Database = parent::sql()->Database;
 		}
 		else
 		{
 		    \$this->Database = \$database;
 		}
-		
-		\$this->isToSaveOrToUpdate=0;
-		\$this->isNew=0;
-		
-		if(\$id != 0)
-		{
-			\$this->structure['".$key."'][4] = $"."id;
-			\$query = parent::makequery('SELECT', \$this->Database, '$class', \$this->structure);
-			\$result= parent::sql(SQL::read)"."->sql_query($"."query);
-	
-			if (parent::sql(SQL::read)"."->sql_num_rows($"."result)==1)
-			{
-				$"."row = parent::sql(SQL::read)->sql_fetch_object($"."result);
-	";
-	
-				/* Class variable load */
 
-				$sql="SHOW COLUMNS FROM `".$table."`";
-					
-				$result = $sqlconnect->sql_query($sql);
-				while ($row = $sqlconnect->sql_fetch_object($result))
-				{				
-					$col = $row->Field;
-					$cthis = "$" . "this->" . $col . " = $" . "row->" . $col;
-						
-					$c.="
-				$cthis;";
-	}
-	
-	$c.="
-				$"."this->isToSaveOrToUpdate=0;
-			}
-			else
+		\$this->structure[\"\$property\"][4] = \$val;
+		\$query = parent::sql()->sql_query(\"SELECT * FROM `$class` WHERE `\$property` = \". parent::sql()->quote(\$val) .\" LIMIT 1\");
+
+		if(parent::sql()->sql_num_rows(\$query) != 0)
+		{
+			while(\$row = parent::sql()->sql_fetch_object(\$query))
+            {
+                ";
+			foreach($interface as $colomName=>$colomArray)
 			{
-				$"."this->".$key." = $"."id;
-				$"."this->isNew=1;
-				$"."this->isToSaveOrToUpdate=1;
+				if($colomArray[1] != "ChildObject" && $colomArray[1] != "ParentObject")
+				{
+				$c .= "\$this->$colomName = \$row->$colomName;
+				";
+				}
 			}
+	$c .= "
+            }
 		}
-	
-	    if (is_null($"."this->".$key."))
-	    {
-	        $"."this->isNew=1;
-			$"."this->isToSaveOrToUpdate=1;
-	    }
 		else
-	    {
-	    	$"."this->structure['".$key."'][4] = $"."this->".$key.";
-	    }
+		{
+			\$this->\$property = \$val;
+			\$this->isNew=1;
+			\$this->isToSaveOrToUpdate=1;
+		}
 	}
 	";
 	
