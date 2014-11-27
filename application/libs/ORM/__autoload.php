@@ -60,6 +60,7 @@ class ORMAutoloader {
 		require libs . "ORM/Common.php";
 		require libs . "ORM/Exception/Exception.php";
 		require libs . "ORM/Exception/DALException.php";
+		require libs . "ORM/Debug/Debug.php";
 		require libs . "ORM/ORM.php";
 
 		if (version_compare(phpversion(), '5.3.0', '>=')) {

@@ -219,9 +219,9 @@ class sql
 	/**
 	 * @return last ID insert
 	 */
-	function sql_insert_id()
-	{
-		return $this->Ressource->lastInsertId();
+	function sql_insert_id($name = NULL)
+	{	
+		return $this->Ressource->lastInsertId($name);
 	}
 	
 	/**

@@ -92,8 +92,7 @@ class $class extends Common
 		 * Generate variables
 		 */
 
-			$sql="SHOW COLUMNS FROM `".$table."`";
-				$result = $sqlconnect->sql_query($sql);
+				$result = $sqlconnect->sql_query("SHOW COLUMNS FROM $table");
 				while ($row = $sqlconnect->sql_fetch_object($result))
 				{
 					$col = $row->Field;
@@ -106,29 +105,32 @@ class $class extends Common
 					else
 					$isnull = 1;
 	
-					if(trim($row->Key)!='')
+					if($row->Key == "MUL")
 					{
 						$c.= "
-	private $$col; // PK";
+	private $$col; // MUL
+	const $col = '$col';";
+						if ($type!="int")
+						$keychar =1;
+						$key = $col;
+						$isnull = 2;
+					}
+					else if($row->Key == "PRI")
+					{
+						$c.= "
+	private $$col; // PRI
+	const $col = '$col'; // PRI
+	const primary_key = '$col'; // PRI";
 						if ($type!="int")
 						$keychar =1;
 						$key = $col;
 						$isnull = 2;
 					}
 					else
-					if(trim($row->Key)=='PRI')
 					{
 						$c.= "
-	private $$col; // PK";
-						if ($type!="int")
-						$keychar =1;
-						$key = $col;
-						$isnull = 2;
-					}
-					else
-					{
-						$c.= "
-	private $$col;";
+	private $$col;
+	const $col = '$col';";
 					}
 					$interface[$col] = array($col, $type, $isnull, 0);
 				}
@@ -742,9 +744,7 @@ class $class extends Common
 	// **********************
 	
 	public function save(\$transaction = null)
-	{
-		global $$save;
-		
+	{		
 		\$thistransaction = \"Off\";
 		
 		if ((is_null($"."this->".$key."))||($"."this->".$key."==0))
@@ -799,20 +799,10 @@ class $class extends Common
 			}
 			else
 			{
-				$"."query = parent::makequery('INSERT', $"."this->Database, '".$class."', $"."this->structure);
+				\$query = parent::makequery('INSERT', $"."this->Database, '".$class."', $"."this->structure);
 				parent::sql(SQL::write)->sql_query($"."query);
-				if (parent::sql(SQL::write)->sql_error())
-				{
-					$"."erreur=parent::sql(SQL::write)->sql_error().\"<br>\".$"."query;
-					if ($"."transaction==\"On\")
-					{
-						parent::sql(SQL::write)->sql_rollbacktransaction();
-					}
-					throw new DALException($"."erreur);
-				}
-				else
-					$"."this->$key=parent::sql(SQL::write)->sql_insert_id();
-				$"."this->isNew=0;
+				\$this->$key=parent::sql(SQL::write)->sql_insert_id();
+				\$this->isNew=0;
 			}
 		}
 	";
@@ -852,6 +842,14 @@ class $class extends Common
 			}
 	
 		return $"."this->$key;
+	}
+
+	public function last_insert(\$property = self::primary_key)
+	{
+		\$query = parent::sql()->sql_query(\"SELECT \$property AS last FROM `entity` ORDER BY \".self::primary_key.\" DESC LIMIT 1\");
+		\$last = parent::sql()->sql_fetch_row(\$query);
+
+		return \$last[\"last\"];
 	}
 	
 	public function __toString()
