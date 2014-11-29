@@ -11,9 +11,9 @@ class ORM {
 	 */
 	const version = 1.5;
 	
-	private $localmode = 0;
-	private $ScreenError = 1;
-	private $sql;
+	protected $localmode = 0;
+	protected $ScreenError = 1;
+	protected $sql;
 	
 	function __construct()
 	{}
@@ -225,7 +225,7 @@ class $class extends Common
 	public \$isNew = 0; // Memory for insert
 	protected \$isToSaveOrToUpdate = 0; // Memory for update
 	//Memory array of fields for update
-	private \$structure = array(
+	protected \$structure = array(
 		";
 			foreach($interface as $colomName=>$colomArray)
 			{
@@ -254,7 +254,6 @@ class $class extends Common
 		    \$this->Database = \$database;
 		}
 
-		\$this->structure[\"\$property\"][4] = \$val;
 		\$query = parent::sql()->sql_query(\"SELECT * FROM `$class` WHERE `\$property` = \". parent::sql()->quote(\$val) .\" LIMIT 1\");
 
 		if(parent::sql()->sql_num_rows(\$query) != 0)
@@ -275,10 +274,11 @@ class $class extends Common
 		}
 		else
 		{
-			\$this->\$property = \$val;
 			\$this->isNew=1;
 			\$this->isToSaveOrToUpdate=1;
 		}
+
+		\$this->structure[\$property][4] = \$val;
 	}
 	";
 	
@@ -597,7 +597,7 @@ class $class extends Common
 		}
 	}
 	
-	private function save_".ucfirst($varname)."($"."transaction = null)
+	protected function save_".ucfirst($varname)."($"."transaction = null)
 	{
 		foreach ($"."this->$varname as $"."$childobject)
 		{
@@ -762,17 +762,8 @@ class $class extends Common
 	
 			if ((isset($"."this->$key))&&($"."this->$key!=\"0\")&&($"."this->isNew!=1))
 			{
-				$"."query = parent::makequery('UPDATE', $"."this->Database, '".$class."', $"."this->structure);
-				$"."result=parent::sql(SQL::write)->sql_query($"."query);
-				if (parent::sql(SQL::write)->sql_error())
-				{
-					$"."erreur=parent::sql(SQL::write)->sql_error().\"<br>\".$"."query;
-					if ($"."transaction==\"On\")
-					{
-						parent::sql(SQL::write)->sql_rollbacktransaction();
-					}
-					throw new DALException($"."erreur);
-				}
+				\$query = parent::makequery('UPDATE', $"."this->Database, '".$class."', \$this->structure);
+				\$result=parent::sql(SQL::write)->sql_query($"."query);
 			}
 			else
 			{
@@ -823,7 +814,7 @@ class $class extends Common
 
 	public function last_insert(\$property = self::primary_key)
 	{
-		\$query = parent::sql()->sql_query(\"SELECT \$property AS last FROM `entity` ORDER BY \".self::primary_key.\" DESC LIMIT 1\");
+		\$query = parent::sql()->sql_query(\"SELECT \$property AS last FROM `$class` ORDER BY \".self::primary_key.\" DESC LIMIT 1\");
 		\$last = parent::sql()->sql_fetch_row(\$query);
 
 		return \$last[\"last\"];
