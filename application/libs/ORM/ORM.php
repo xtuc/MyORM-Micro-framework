@@ -266,6 +266,8 @@ class $class extends Common
 				if($colomArray[1] != "ChildObject" && $colomArray[1] != "ParentObject")
 				{
 				$c .= "\$this->$colomName = \$row->$colomName;
+				\$this->structure['$colomName'][3]=1;
+				\$this->structure['$colomName'][4] = \$row->$colomName;
 				";
 				}
 			}
@@ -306,8 +308,8 @@ class $class extends Common
 			{
 				call_user_func( array($"."this,'set_'.(string)$"."property), $"."value );
 				$"."this->isToSaveOrToUpdate=1;
-				$"."this->structure[$"."property][3]=1;
-				$"."this->structure[$"."property][4] = $"."value;";
+				$"."this->structure[\$property][3]=1;
+				$"."this->structure[\$property][4] = \$value;";
 				if (trim($intotheset)!="")
 			$c.="
 				".trim($intotheset);
