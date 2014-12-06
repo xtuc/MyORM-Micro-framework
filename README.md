@@ -5,7 +5,7 @@ Fonctionnalités du framework :
 - Un MVC utilisant l'url rewriting très facile à utiliser.
 - Un moteur de template : Twig composant de Symfony2 ([Twig sensiolabs](http://twig.sensiolabs.org/))
 
->Le projet a déjà fait ces preuves mais est encore au stade de développement. Nous avons beaucoup d'ambitions et d'idées pour son future. Votre aide est la bienvenue et n'hésitez pas à nous contacter via l'adresse suivante : [MyORM at xtuc.ninja](mailto:MyORM@xtuc.ninja).
+>Le projet a déjà fait ces preuves mais est encore au stade de développement. Votre aide est naturellement la bienvenue et n'hésitez pas à nous contacter via l'adresse suivante : [MyORM at xtuc.ninja](mailto:MyORM@xtuc.ninja).
 
 ## Configuration
 
