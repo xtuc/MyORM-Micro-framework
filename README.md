@@ -5,8 +5,6 @@ Fonctionnalités du framework :
 - Un MVC utilisant l'url rewriting très facile à utiliser.
 - Un moteur de template : Twig composant de Symfony2 ([Twig sensiolabs](http://twig.sensiolabs.org/))
 
-[Site de démonstration](http://MyORM.xtuc.net/)
-
 ## Configuration
 
 La configuration du framework se fait à partir du sossier /application/config. Les paramètres sont défini par la fonction define() de PHP. Config.php est le fichier de configuration générale et le fichier orm_config.php celui spécifique à l'ORM.
