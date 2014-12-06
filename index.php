@@ -6,11 +6,6 @@ ini_set('display_errors', E_ALL);
 // load application config (error reporting etc.)
 require 'application/config/config.php';
 
-global $languages;
-require libs . "Languages.php"; // Require custom Slim component Languages.php : traductions
-
-$languages = new Languages();
-
 /**
  * Twig Load and init
  */

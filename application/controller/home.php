@@ -15,7 +15,27 @@ class Home extends Controller
      * This method handles what happens when you move to http://yourproject/home/index (which is the default page btw)
      */
     public function index()
-    {       	    	
-        $this->render('home/home');
+    {
+        $this->render('home/index');
+    }
+
+    /**
+     * PAGE: exampleone
+     * This method handles what happens when you move to http://yourproject/home/exampleone
+     * The camelCase writing is just for better readability. The method name is case insensitive.
+     */
+    public function exampleOne()
+    {
+        $this->render('home/example_one');
+    }
+
+    /**
+     * PAGE: exampletwo
+     * This method handles what happens when you move to http://yourproject/home/exampletwo
+     * The camelCase writing is just for better readability. The method name is case insensitive.
+     */
+    public function exampleTwo()
+    {
+        $this->render('home/example_two');
     }
 }
