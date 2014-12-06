@@ -54,6 +54,24 @@ Maintenant vous souhaitez supprimer ce membre:
 $membre->delete();
 ```
 
+Si vous souhaitez ajouter un membre:
+```php
+$membre = new ORM\membre();
+
+$membre->Nom = "DEJEAN";
+$membre->Prenom = "Marc";
+$membre->save();
+```
+
+ID|Nom|Prenom 
+-------|--------|---------- 
+1|DUPONT|Alain 
+2|MARTIN|Marc
+3|BOUVIER|Alain
+4|DUBOIS|Paul
+5|DREYFUS|Jean 
+6|DEJEAN|Marc
+
 Vous pouvez personnaliser l'ORM pour l'adapter à votre site. Par exemple si vous souhaitez récupérer un membre en function de son prénom. Vous devez créer un fichier PHP destiné à la couche modèle du MVC dans le dossier /application/models. Créez une class qui hérite de la class ORM\membre.
 ```php
 namespace ORM;
