@@ -1,11 +1,11 @@
 # MyORM-Micro-framework
 
 Fonctionnalités du framework :
-- Un ORM puissant pour la partie backend.
+- Un ORM innovateur et puissant pour la partie backend.
 - Un MVC utilisant l'url rewriting très facile à utiliser.
 - Un moteur de template : Twig composant de Symfony2 ([Twig sensiolabs](http://twig.sensiolabs.org/))
 
-[Site de démonstration](http://MyORM.xtuc.net/)
+>Le projet a déjà fait ces preuves mais est encore au stade de développement. Votre aide est naturellement la bienvenue et n'hésitez pas à nous contacter via l'adresse suivante : [MyORM at xtuc.ninja](mailto:MyORM@xtuc.ninja).
 
 ## Configuration
 
