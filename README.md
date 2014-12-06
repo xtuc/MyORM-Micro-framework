@@ -1,7 +1,7 @@
 # MyORM-Micro-framework
 
 Fonctionnalités du framework :
-- Un ORM puissant pour la partie backend.
+- Un ORM innovateur et puissant pour la partie backend.
 - Un MVC utilisant l'url rewriting très facile à utiliser.
 - Un moteur de template : Twig composant de Symfony2 ([Twig sensiolabs](http://twig.sensiolabs.org/))
 
