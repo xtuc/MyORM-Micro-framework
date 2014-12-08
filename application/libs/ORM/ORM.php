@@ -843,6 +843,60 @@ class $class extends Common
 		return $"."return;
 	}
 	
+	public function __toJson()
+	{
+		$"."return = \"{\";
+		foreach ($"."this->struture as $"."field)
+		{
+			if ( ($"."field[1] == 'ChildObject') && (!is_null($"."this->{"."$"."field[0]})) )
+			{
+				$"."return .= '\"'.$"."field[0].'\":';
+				$"."return .= \"[\";
+				$"."i=0;
+				foreach ($"."this->{"."$"."field[0]} as &$"."childvar)
+				{
+					$"."return .= $"."childvar->__toJson();
+					$"."return .= \",\";
+					$"."i++;
+				}
+				$"."return = substr($"."return, 0, -1);
+				$"."return .= \"],\";
+			}
+			else
+			{
+				/*
+				if ( is_callable( array($"."this,'get_'.(string)$"."field[0]) ) )
+	  				call_user_func( array($"."this,'get_'.(string)$"."field[0]) );
+	  			*/
+				if ($"."this->{"."$"."field[0]}==\"\")
+				{
+					if ($"."field[2]==1)
+					{
+						$"."return .= '\"'.$"."field[0].'\":null,';
+					}
+					else
+					{
+						$"."return .= '\"'.$"."field[0].'\":\"\",';
+					}
+				}
+				else
+				{
+					if (($"."field[1]!='date')&&($"."field[1]!='datetime')&&($"."field[1]!='char')&&($"."field[1]!='varchar')&&($"."field[1]!='tinyblob')&&($"."field[1]!='tinytext')&&($"."field[1]!='blob')&&($"."field[1]!='text')&&($"."field[1]!='mediumblob')&&($"."field[1]!='mediumtext')&&($"."field[1]!='longblob')&&($"."field[1]!='longtext')&&($"."field[1]!='time')&&($"."field[1]!='enum'))
+					{
+						$"."return .= '\"'.$"."field[0].'\":'.$"."this->{"."$"."field[0]}.',';
+					}
+					else
+					{
+						$"."return .= '\"'.$"."field[0].'\":\"'.$"."this->{"."$"."field[0]}.'\",';
+					}
+				}
+			}
+		}
+		$"."return = substr($"."return,0,-1);
+		$"."return .= \"}\";
+		return $"."return;
+	}
+	
 	public function __clone()
 	{
 		\$this->LoadAllChilds();
