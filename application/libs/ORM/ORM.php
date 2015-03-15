@@ -308,9 +308,19 @@ class $class extends Common
 	$c.="public function __get( \$property )
 	{
 	    if ( is_callable( array($"."this,'get_'.(string)$"."property) ) )
-	        return htmlentities(call_user_func( array($"."this,'get_'.(string)$"."property) ));
-	    else
+	    {
+	        $result = call_user_func( array($"."this,'get_'.(string)$"."property) );
+
+	        if(is_string($result))
+	        {
+				$result = htmlentities($result);
+	        }
+
+	        return $result;
+	    }
+	    else {
 	        throw new DALException(\"get for \".$"."property.\" doesn't exists\");
+	    }
 	}
 	
 	public function __set( \$property, \$val )
