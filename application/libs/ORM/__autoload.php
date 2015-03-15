@@ -53,6 +53,34 @@ class ORMAutoloader {
 			}
 		}
 	}
+
+	public static function execSQL()
+	{
+		/**
+		 * Exec SQL/
+		 */ 
+		if ($handle = opendir(app . 'SQL')) {
+
+			$sql = new sql(SQL::write);
+
+		    while (false !== ($entry = readdir($handle))) {
+		    	if(preg_match("/([A-Za-z0-9.]*).sql/i", $entry))
+		    	{
+		    		$query = file_get_contents(app . "SQL/" . $entry);
+		    		if((boolean) $sql->sql_query($query))
+		    		{
+		    			exit("error importing " . app . "SQL/" . $entry);
+		    		}
+		    		else
+		    		{
+		    			unlink(app . "SQL/" . $entry);
+		    		}
+		    	}
+		    }
+
+		    closedir($handle);
+		}
+	}
 	
 	public static function RegisterAutoloader()
 	{
@@ -67,6 +95,10 @@ class ORMAutoloader {
 		} else {
 			spl_autoload_register(array(__CLASS__, 'autoload'));
 		}
+
+		/**
+		 * Exec SQL/
+		 */ 
+		self::execSQL();
 	}
-	
 }

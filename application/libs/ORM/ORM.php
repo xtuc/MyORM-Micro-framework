@@ -2,7 +2,7 @@
 
 namespace ORM;
 
-use ORM\SQL\SQL;
+use ORM\SQL;
 
 class ORM {
 	
@@ -15,8 +15,7 @@ class ORM {
 	protected $ScreenError = 1;
 	protected $sql;
 	
-	function __construct()
-	{}
+	function __construct() {}
 	
 	public function saveclasstofile($filename,$filecontent,$directory)
 	{
@@ -40,7 +39,7 @@ class ORM {
 	
 	function classgenerator($table)
 	{		
-		$sqlconnect = new SQL();
+		$sqlconnect = new SQL\SQL();
 
 		$select = "sql";
 		if (defined(SQL2))
@@ -65,7 +64,7 @@ class ORM {
 $c = "<?php
 namespace ORM;
 		
-use ORM\SQL\SQL;
+use ORM\SQL;
 use ORM\Exception\DALException;
 		
 	/*
@@ -104,18 +103,8 @@ class $class extends Common
 					$isnull = 0;
 					else
 					$isnull = 1;
-	
-					if($row->Key == "MUL")
-					{
-						$c.= "
-	private $$col; // MUL
-	const $col = '$col';";
-						if ($type!="int")
-						$keychar =1;
-						$key = $col;
-						$isnull = 2;
-					}
-					else if($row->Key == "PRI")
+
+					if($row->Key == "PRI")
 					{
 						$c.= "
 	private $$col; // PRI
@@ -229,6 +218,11 @@ class $class extends Common
 		";
 			foreach($interface as $colomName=>$colomArray)
 			{
+				// 0 : Nom du champ
+				// 1 : type
+				// 2 : Nullalbe
+				// 3 : Is to save ?
+				// 4 : Valeur
 			$c .= "'$colomName' => array('". $colomArray[0] ."', '". $colomArray[1] ."', '". $colomArray[2] ."', '". $colomArray[3] ."', '')";
 				
 				if(end($interface) !== $colomArray)
@@ -254,33 +248,52 @@ class $class extends Common
 		    \$this->Database = \$database;
 		}
 
-		\$query = parent::sql()->sql_query(\"SELECT * FROM `$class` WHERE `\$property` = \". parent::sql()->quote(\$val) .\" LIMIT 1\");
-
-		if(parent::sql()->sql_num_rows(\$query) != 0)
+		if(isset(\$val))
 		{
-			while(\$row = parent::sql()->sql_fetch_object(\$query))
-            {
-                ";
-			foreach($interface as $colomName=>$colomArray)
+			if(\$property == self::primary_key)
 			{
-				if($colomArray[1] != "ChildObject" && $colomArray[1] != "ParentObject")
-				{
-				$c .= "\$this->$colomName = \$row->$colomName;
-				\$this->structure['$colomName'][3]=1;
-				\$this->structure['$colomName'][4] = \$row->$colomName;
-				";
-				}
+				\$val = intval(\$val);
 			}
-	$c .= "
-            }
-		}
-		else
-		{
-			\$this->isNew=1;
-			\$this->isToSaveOrToUpdate=1;
+			else
+			{
+				\$val = addslashes(\$val);
+			}
+
+			\$query = parent::sql()->sql_query(\"SELECT * FROM `$class` WHERE `\$property` = \". parent::sql()->quote(\$val) .\" LIMIT 1\");
+
+			if(parent::sql()->sql_num_rows(\$query) != 0)
+			{
+				while(\$row = parent::sql()->sql_fetch_object(\$query))
+	            {
+	                ";
+				foreach($interface as $colomName=>$colomArray)
+				{
+					if($colomArray[1] != "ChildObject" && $colomArray[1] != "ParentObject")
+					{
+					$c .= "\$this->$colomName = \$row->$colomName;
+					\$this->structure['$colomName'][4] = \$row->$colomName;
+					";
+					}
+				}
+		$c .= "
+	            }
+			}
+			else
+			{
+				\$this->isNew=1;
+				\$this->isToSaveOrToUpdate=1;
+			}
 		}
 
-		\$this->structure[\$property][4] = \$val;
+		if (is_null(\$this->{self::primary_key}))
+        {
+            \$this->isNew=1;
+            \$this->isToSaveOrToUpdate=1;
+        }
+        else
+        {
+           \$this->structure[self::primary_key][4] = \$this->{self::primary_key};
+        }
 	}
 	";
 	
@@ -295,21 +308,23 @@ class $class extends Common
 	$c.="public function __get( \$property )
 	{
 	    if ( is_callable( array($"."this,'get_'.(string)$"."property) ) )
-	        return call_user_func( array($"."this,'get_'.(string)$"."property) );
+	        return htmlentities(call_user_func( array($"."this,'get_'.(string)$"."property) ));
 	    else
 	        throw new DALException(\"get for \".$"."property.\" doesn't exists\");
 	}
 	
-	public function __set( $"."property, $"."value )
+	public function __set( \$property, \$val )
 	{
-		if ( is_callable( array($"."this,'set_'.(string)$"."property) ) )
+		if ( is_callable( array(\$this,'set_'.(string)$"."property) ) )
 		{
-			if ( $"."value != call_user_func( array($"."this,'get_'.(string)$"."property) ) )
+			\$val = addslashes(\$val);
+
+			if ( $"."val != call_user_func( array($"."this,'get_'.(string)$"."property) ) )
 			{
-				call_user_func( array($"."this,'set_'.(string)$"."property), $"."value );
+				call_user_func( array($"."this,'set_'.(string)$"."property), $"."val );
 				$"."this->isToSaveOrToUpdate=1;
 				$"."this->structure[\$property][3]=1;
-				$"."this->structure[\$property][4] = \$value;";
+				$"."this->structure[\$property][4] = \$val;";
 				if (trim($intotheset)!="")
 			$c.="
 				".trim($intotheset);
@@ -374,7 +389,7 @@ class $class extends Common
 		$col=$row->Field;
 		$c.="public function get_".$col."()
 	{
-		return stripslashes($"."this->".$col.");
+		return $"."this->".$col.";
 	}
 	
 	";
@@ -395,23 +410,23 @@ class $class extends Common
 				{
 					case "int":
 		$c .= "if(is_numeric(\$valeur) && \$valeur >= 0)
-				{
-					\$this->$col = addslashes(\$valeur);
-				}
-				else
-				{
-					throw new DALException('$class::$col must be a valid integer');
-				}";
+			{
+				\$this->$col = intval(\$valeur);
+			}
+			else
+			{
+				throw new DALException('$class::$col must be a valid integer');
+			}";
 						break;
 					case "varchar":
 		$c .= "if(is_string(\$valeur))
-				{
-					\$this->$col = addslashes(\$valeur);
-				}
-				else
-				{
-					throw new DALException('$class::$col must be a valid string');
-				}";
+			{
+				\$this->$col = addslashes(\$valeur);
+			}
+			else
+			{
+				throw new DALException('$class::$col must be a valid string');
+			}";
 						break;
 					default:
 		$c .= "\$this->$col = addslashes(\$valeur);";
@@ -517,10 +532,12 @@ class $class extends Common
 		$sql="SELECT TABLE_SCHEMA, TABLE_NAME, COLUMN_NAME, REFERENCED_TABLE_SCHEMA, REFERENCED_TABLE_NAME, REFERENCED_COLUMN_NAME FROM information_schema.KEY_COLUMN_USAGE WHERE REFERENCED_TABLE_NAME = '".$table."' AND REFERENCED_COLUMN_NAME = '".$key."' AND TABLE_SCHEMA = '".$sqlconnect->get_Database()."'";
 	}
 	$result = $sqlconnect->sql_query($sql);
-	if ($sqlconnect->sql_num_rows($result)>0)
+
+	if ($sqlconnect->sql_num_rows($result)!=0)
 	{
 	while ($row = $sqlconnect->sql_fetch_object($result))
 	{
+
 		$varname=ucfirst($row->TABLE_NAME).str_replace ( "Id" , "" , str_replace ( "id" , "" , str_replace ( "ID" , "" , $row->COLUMN_NAME )));
 		
 		$childtable=$row->TABLE_NAME;
@@ -558,8 +575,8 @@ class $class extends Common
 		if ((is_null($"."this->".$varname."))&&(!is_null($"."this->$key)))
 		{
 			$"."query=".$query.";
-			$"."result=parent::sql(SQL::read)->sql_query($"."query);
-			while($"."row = parent::sql(SQL::read)->sql_fetch_object(\$result,'ORM\\$childobject'))
+			$"."result=parent::sql(\ORM\SQL\SQL::read)->sql_query($"."query);
+			while($"."row = parent::sql(\ORM\SQL\SQL::read)->sql_fetch_object(\$result,'ORM\\$childobject'))
 			{
 				$"."this->add_".ucfirst($varname)."($"."row);
 			}
@@ -619,18 +636,18 @@ class $class extends Common
 			}
 		
 		$"."query = ".$querydelete.";
-		parent::sql(SQL::write)->sql_query($"."query);
-		if (parent::sql(SQL::write)->sql_error())
+		parent::sql(\ORM\SQL\SQL::write)->sql_query($"."query);
+		if (parent::sql(\ORM\SQL\SQL::write)->sql_error())
 		{
-			$"."erreur=parent::sql(SQL::write)->sql_error().\"<br>\".$"."query;
+			$"."erreur=parent::sql(\ORM\SQL\SQL::write)->sql_error().\"<br>\".$"."query;
 			if ($"."transaction==\"On\")
 			{
-				parent::sql(SQL::write)->sql_rollbacktransaction();
+				parent::sql(\ORM\SQL\SQL::write)->sql_rollbacktransaction();
 			}
 			throw new DALException($"."erreur);
 		}
 		else
-			return parent::sql(SQL::write)->sql_affected_rows();
+			return parent::sql(\ORM\SQL\SQL::write)->sql_affected_rows();
 		
 		$"."this->".ucfirst($varname)."= null;
 	}
@@ -657,8 +674,8 @@ class $class extends Common
 			{
 				$"."thistransaction=\"On\";
 				$"."transaction = \"On\";
-				if (parent::sql(SQL::write)->TransactionMode == 1)
-					parent::sql(SQL::write)->sql_starttransaction();
+				if (parent::sql(\ORM\SQL\SQL::write)->TransactionMode == 1)
+					parent::sql(\ORM\SQL\SQL::write)->sql_starttransaction();
 			}
 	";
 	
@@ -693,22 +710,22 @@ class $class extends Common
 	
 	$c .= "
 				$"."query = parent::makequery('DELETE', $"."this->Database, '".$class."', $"."this->structure);
-				parent::sql(SQL::write)->sql_query($"."query);
-				if (parent::sql(SQL::write)->sql_error())
+				parent::sql(\ORM\SQL\SQL::write)->sql_query($"."query);
+				if (parent::sql(\ORM\SQL\SQL::write)->sql_error())
 				{
-					$"."erreur=parent::sql(SQL::write)->sql_error().\"<br>\".$"."query;
-					if (parent::sql(SQL::write)->TransactionMode == 1)
+					$"."erreur=parent::sql(\ORM\SQL\SQL::write)->sql_error().\"<br>\".$"."query;
+					if (parent::sql(\ORM\SQL\SQL::write)->TransactionMode == 1)
 					{
-						parent::sql(SQL::write)->sql_rollbacktransaction();
+						parent::sql(\ORM\SQL\SQL::write)->sql_rollbacktransaction();
 					}
 					throw new DALException($"."erreur);
 				}
 				else
-					$"."return = parent::sql(SQL::write)->sql_affected_rows();
+					$"."return = parent::sql(\ORM\SQL\SQL::write)->sql_affected_rows(parent::sql());
 			}
-			if ((parent::sql(SQL::write)->TransactionMode == 1)&&($"."thistransaction==\"On\"))
+			if ((parent::sql(\ORM\SQL\SQL::write)->TransactionMode == 1)&&($"."thistransaction==\"On\"))
 			{
-				parent::sql(SQL::write)->sql_committransaction();
+				parent::sql(\ORM\SQL\SQL::write)->sql_committransaction();
 			}
 			return $"."return;
 		}
@@ -765,13 +782,13 @@ class $class extends Common
 			if ((isset($"."this->$key))&&($"."this->$key!=\"0\")&&($"."this->isNew!=1))
 			{
 				\$query = parent::makequery('UPDATE', $"."this->Database, '".$class."', \$this->structure);
-				\$result=parent::sql(SQL::write)->sql_query($"."query);
+				\$result=parent::sql(\ORM\SQL\SQL::write)->sql_query($"."query);
 			}
 			else
 			{
 				\$query = parent::makequery('INSERT', $"."this->Database, '".$class."', $"."this->structure);
-				parent::sql(SQL::write)->sql_query($"."query);
-				\$this->$key=parent::sql(SQL::write)->sql_insert_id();
+				parent::sql(\ORM\SQL\SQL::write)->sql_query($"."query);
+				\$this->$key=parent::sql(\ORM\SQL\SQL::write)->sql_insert_id();
 				\$this->isNew=0;
 			}
 		}
@@ -822,40 +839,78 @@ class $class extends Common
 		return \$last[\"last\"];
 	}
 	
-	public function __toString()
+	public function toString($"."var = 'first')
 	{
+		$"."this->LoadAllParents();
 		$"."this->LoadAllChilds();
-		$"."return = \"<p>Object \".__CLASS__.\" (<br>\";
-		foreach ($"."this->struture as $"."field)
-			if ($"."field[1] == 'ChildObject')
+		$"."return = \"Object \".__CLASS__.\" (<br>\";
+		foreach ($"."this->structure as $"."field)
+		{
+			if ( ($"."field[1] == 'ChildObject') && (!is_null($"."this->{"."$"."field[0]})) && ( ( $"."var == 'first' ) || ( $"."var == 'down' ) ) )
 			{
-				//$"."i=0;
-				//if (!is_null($"."this->{"."$"."field[0]}))
-				//	foreach ($"."this->{"."$"."field[0]} as &$"."childvar)
-				//	{
-				//		$"."return .= $"."field[0].\"[$"."i] => \".$"."this->{"."$"."field[0]}[$"."i].\"<br>\";
-				//		$"."i++;
-				//	}
+				$"."return .= '\"'.$"."field[0].'\" =>';
+				$"."return .= \" Array ( <br>\";
+				$"."i=0;
+				foreach ($"."this->{"."$"."field[0]} as &$"."childvar)
+				{
+					$"."return .= $"."childvar->toString('down');
+					$"."return .= \",<br>\";
+					$"."i++;
+				}
+				$"."return = substr($"."return, 0, -5);
+				$"."return .= \"<br> ) <br>\";
 			}
 			else
-				$"."return .= $"."field[0].\" => \".$"."this->{"."$"."field[0]}.\"<br>\";
-		$"."return .= \")</p>\";
+			{
+				if ( ($"."field[1] == 'ParentObject') && (!is_null($"."this->{"."$"."field[0]})) && ( $"."var == 'first' ) )
+				{
+					$"."return .= '\"'.$"."field[0].'\" => ';
+					$"."return .= $"."this->{"."$"."field[0]}->toString('none');
+					$"."return .= \"<br>\";
+				}
+				else
+				{					
+					if ($"."this->{"."$"."field[0]}==\"\")
+					{
+						if ($"."field[2]==1)
+						{
+							$"."return .= '\"'.$"."field[0].'\" => null<br>';
+						}
+						else
+						{
+							$"."return .= '\"'.$"."field[0].'\" => \"\"<br>';
+						}
+					}
+					else
+					{
+						if ( ($"."field[1] != 'ParentObject') && ($"."field[1] != 'ChildObject') )
+						{
+							$"."return .= '\"'.$"."field[0].'\" => '.$"."this->{"."$"."field[0]}.'<br>';
+						}
+					}
+				}
+			}
+		}
+		$"."return = substr($"."return,0,-1);
+		$"."return .= \")\";
 		return $"."return;
 	}
 	
-	public function __toJson()
+	public function get_toJson($"."var = 'first')
 	{
+		$"."this->LoadAllParents();
+		$"."this->LoadAllChilds();
 		$"."return = \"{\";
-		foreach ($"."this->struture as $"."field)
+		foreach ($"."this->structure as $"."field)
 		{
-			if ( ($"."field[1] == 'ChildObject') && (!is_null($"."this->{"."$"."field[0]})) )
+			if ( ($"."field[1] == 'ChildObject') && (!is_null($"."this->{"."$"."field[0]})) && ( ( $"."var == 'first' ) || ( $"."var == 'down' ) ) )
 			{
 				$"."return .= '\"'.$"."field[0].'\":';
 				$"."return .= \"[\";
 				$"."i=0;
 				foreach ($"."this->{"."$"."field[0]} as &$"."childvar)
 				{
-					$"."return .= $"."childvar->__toJson();
+					$"."return .= $"."childvar->get_toJson('down');
 					$"."return .= \",\";
 					$"."i++;
 				}
@@ -864,30 +919,38 @@ class $class extends Common
 			}
 			else
 			{
-				/*
-				if ( is_callable( array($"."this,'get_'.(string)$"."field[0]) ) )
-	  				call_user_func( array($"."this,'get_'.(string)$"."field[0]) );
-	  			*/
-				if ($"."this->{"."$"."field[0]}==\"\")
+				if ( ($"."field[1] == 'ParentObject') && (!is_null($"."this->{"."$"."field[0]})) && ( $"."var == 'first' ) )
 				{
-					if ($"."field[2]==1)
-					{
-						$"."return .= '\"'.$"."field[0].'\":null,';
-					}
-					else
-					{
-						$"."return .= '\"'.$"."field[0].'\":\"\",';
-					}
+					$"."return .= '\"'.$"."field[0].'\":';
+					$"."return .= $"."this->{"."$"."field[0]}->get_toJson('none');
+					$"."return .= \",\";
 				}
 				else
-				{
-					if (($"."field[1]!='date')&&($"."field[1]!='datetime')&&($"."field[1]!='char')&&($"."field[1]!='varchar')&&($"."field[1]!='tinyblob')&&($"."field[1]!='tinytext')&&($"."field[1]!='blob')&&($"."field[1]!='text')&&($"."field[1]!='mediumblob')&&($"."field[1]!='mediumtext')&&($"."field[1]!='longblob')&&($"."field[1]!='longtext')&&($"."field[1]!='time')&&($"."field[1]!='enum'))
+				{					
+					if ($"."this->{"."$"."field[0]}==\"\")
 					{
-						$"."return .= '\"'.$"."field[0].'\":'.$"."this->{"."$"."field[0]}.',';
+						if ($"."field[2]==1)
+						{
+							$"."return .= '\"'.$"."field[0].'\":null,';
+						}
+						else
+						{
+							$"."return .= '\"'.$"."field[0].'\":\"\",';
+						}
 					}
 					else
 					{
-						$"."return .= '\"'.$"."field[0].'\":\"'.$"."this->{"."$"."field[0]}.'\",';
+						if ( ($"."field[1] != 'ParentObject') && ($"."field[1] != 'ChildObject') )
+						{
+							if (($"."field[1]!='timestamp')&&($"."field[1]!='date')&&($"."field[1]!='datetime')&&($"."field[1]!='char')&&($"."field[1]!='varchar')&&($"."field[1]!='tinyblob')&&($"."field[1]!='tinytext')&&($"."field[1]!='blob')&&($"."field[1]!='text')&&($"."field[1]!='mediumblob')&&($"."field[1]!='mediumtext')&&($"."field[1]!='longblob')&&($"."field[1]!='longtext')&&($"."field[1]!='time')&&($"."field[1]!='enum'))
+							{
+								$"."return .= '\"'.$"."field[0].'\":'.$"."this->{"."$"."field[0]}.',';
+							}
+							else
+							{
+								$"."return .= '\"'.$"."field[0].'\":\"'.$"."this->{"."$"."field[0]}.'\",';
+							}
+						}
 					}
 				}
 			}
@@ -902,7 +965,7 @@ class $class extends Common
 		\$this->LoadAllChilds();
 		\$this->$key = null;
 		\$this->isToSaveOrToUpdate = 1;
-		foreach ($"."this->struture as $"."field)
+		foreach ($"."this->structure as $"."field)
 			if (($"."field[1] == 'ChildObject')&&(!is_null($"."this->{"."$"."field[0]})))
 				foreach ($"."this->{"."$"."field[0]} as &$"."childvar)
 					$"."childvar = clone $"."childvar;
@@ -910,11 +973,32 @@ class $class extends Common
 							
 	public function LoadAllParents()
 	{
-";
-		foreach($parents_func as $func)
+		";
+	if ($table_relation_exists)
+	{
+		$sql="SELECT TABLE_SCHEMA, TABLE_NAME, COLUMN_NAME, REFERENCED_TABLE_SCHEMA, REFERENCED_TABLE_NAME ,REFERENCED_COLUMN_NAME FROM ".$relation." WHERE REFERENCED_TABLE_NAME = '".$table."' AND REFERENCED_COLUMN_NAME = '".$key."'";
+	}
+	else
+	{
+		$sql="SELECT TABLE_SCHEMA, TABLE_NAME, COLUMN_NAME, REFERENCED_TABLE_SCHEMA, REFERENCED_TABLE_NAME, REFERENCED_COLUMN_NAME FROM information_schema.KEY_COLUMN_USAGE WHERE REFERENCED_TABLE_NAME = '".$table."' AND REFERENCED_COLUMN_NAME = '".$key."' AND TABLE_SCHEMA = '".$sqlconnect->get_Database()."'";
+	}
+	$result = $sqlconnect->sql_query($sql);
+	if ($sqlconnect->sql_num_rows($result)>0)
+	{
+		while ($row = $sqlconnect->sql_fetch_object($result))
 		{
-		$c .= "		\$this->$func();";
+			$varname=ucfirst($row->TABLE_NAME).str_replace ( "Id" , "" , str_replace ( "id" , "" , str_replace ( "ID" , "" , $row->COLUMN_NAME )));
+			$childtable=$row->TABLE_NAME;
+			$childobject= $row->TABLE_NAME;
+			$childcolumn=$row->COLUMN_NAME;
+	
+			$c.="if (!is_null($"."this->".$varname."))
+			$"."this->get_".$varname."();
+		";
+	
 		}
+	}
+		
 $c .= "
 	}
 	
@@ -940,10 +1024,11 @@ $c .= "
 			$childcolumn=$row->COLUMN_NAME;
 		
 			$c.="
-			\$this->get_".$varname."();";
+		\$this->get_".$varname."();";
 		}
 	}
-	$c.="}
+	$c.="
+	}
 		
 	//endofclass
 }
@@ -953,4 +1038,5 @@ $c .= "
 	}
 	
 }
+
 ?>

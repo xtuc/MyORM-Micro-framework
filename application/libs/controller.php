@@ -4,17 +4,7 @@
  * This is the "base controller class". All other "real" controllers extend this class.
  */
 class Controller
-{
-
-    /**
-     * Whenever a controller is created, open a database connection too. The idea behind is to have ONE connection
-     * that can be used by multiple models (there are frameworks that open one connection per model).
-     */
-    function __construct()
-    {
-    	
-    }
-
+{    
     public function render($view, $data_array = array())
     {
         // load Twig, the template engine
@@ -25,7 +15,7 @@ class Controller
         ));
         $twig->addExtension(new Twig_Extension_Debug());
         
-        if(isset($_SESSION))
+        if(isset($_SESSION) && is_array($data_array))
         {
         	$data_array["SESSION"] = $_SESSION;
         }
@@ -33,11 +23,6 @@ class Controller
         if(isset($_GET))
         {
         	$data_array["GET"] = $_GET;
-        }
-        
-        if(isset($GLOBALS["languages"]))
-        {
-        	$data_array["trads"] = $GLOBALS["languages"]->GettradObject();
         }
         
         // render a view while passing the to-be-rendered data

@@ -23,8 +23,17 @@ define("libs", app . "libs/");
 /**
  * Define URL
  */
-$dir = str_replace("index.php", "", $_SERVER["SCRIPT_NAME"]);
-define('URL', "http://" . $_SERVER["HTTP_HOST"] . $dir);
+if(isset($_SERVER["HTTP_HOST"]))
+{
+	define("CLI", FALSE);
+	$dir = str_replace("index.php", "", $_SERVER["SCRIPT_NAME"]);
+	define('URL', "http://" . $_SERVER["HTTP_HOST"] . $dir);
+}
+else
+{
+	define("CLI", TRUE);
+	$dir = getcwd();
+}
 
 /**
  * Configuration for: Database
@@ -32,10 +41,23 @@ define('URL', "http://" . $_SERVER["HTTP_HOST"] . $dir);
  */
 
 define('DB_TYPE', 'mysql');
+
 define('DB_HOST', 'localhost');
-define('DB_NAME', 'site');
-define('DB_USER', 'site');
-define('DB_PASS', 'secret'); 
+define('DB_NAME', 'testorm');
+define('DB_USER', 'root');
+define('DB_PASS', 'ytz2014fr');
+
+/**
+ *  If u want to have a specific connection chain for Write
+ *  
+ * define('DBW_TYPE', 'mysql');
+ * define('DBW_HOST', 'xtuc.fr');
+ * define('DBW_NAME', 'devintranetffjv');
+ * define('DBW_USER', 'devintranetffjv');
+ * define('DBW_PASS', 'devintranetffjv');
+ * define('TRANSACTIONW_MODE', 'IfDefined');
+ * define('SQLW_DEBUG', 'IfDefined');
+*/
 
 /**
  * Configuration for: Views

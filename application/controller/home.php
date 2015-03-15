@@ -16,26 +16,14 @@ class Home extends Controller
      */
     public function index()
     {
-        $this->render('home/index');
+        $this->render("home/home");	
     }
 
     /**
-     * PAGE: exampleone
-     * This method handles what happens when you move to http://yourproject/home/exampleone
-     * The camelCase writing is just for better readability. The method name is case insensitive.
+     * 404 pages called from libs/application.php
      */
-    public function exampleOne()
+    public function error404()
     {
-        $this->render('home/example_one');
-    }
-
-    /**
-     * PAGE: exampletwo
-     * This method handles what happens when you move to http://yourproject/home/exampletwo
-     * The camelCase writing is just for better readability. The method name is case insensitive.
-     */
-    public function exampleTwo()
-    {
-        $this->render('home/example_two');
+    	exit("404");
     }
 }

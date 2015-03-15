@@ -22,45 +22,82 @@ class sql
 	public $TransactionMode; // 1 for InnoDB(MySQL)/MsSQL in transaction mode, 0 for MyISAM(MySQL) 
 	public $Debug; // 1 to display all executed request 
 	
-	function __construct()
+	function __construct($constType = SQL::read)
 	{
 		if(empty($this->Ressource))
 		{
 			if (class_exists('PDO'))
 			{
-				$this->Server = DB_HOST;
-				$this->User = DB_USER;
-				$this->Password = DB_PASS;
-				$this->Database = DB_NAME;
-				$this->Connection_Type = DB_TYPE;
-
-				if(defined("DB_CHARSET"))
+				if ( ($constType == SQL::write) && ( defined("DB_WHOST") ) )
 				{
-					$this->Charset = DB_CHARSET;
+					$this->Server = DB_WHOST;
+					$this->User = DB_WUSER;
+					$this->Password = DB_WPASS;
+					$this->Database = DB_WNAME;
+					$this->Connection_Type = DB_WTYPE;
+	
+					if(defined("DB_CHARSET"))
+					{
+						$this->Charset = DB_WCHARSET;
+					}
+					else
+					{
+						$this->Charset = "UTF8";
+					}
+	
+					if(defined("TRANSACTIONW_MODE"))
+					{
+						$this->TransactionMode = TRANSACTIONW_MODE;
+					}
+					else
+					{
+						$this->TransactionMode = FALSE;
+					}
+	
+					if(defined("SQLW_DEBUG"))
+					{
+						$this->Debug = TRUE;
+					}
+					else
+					{
+						$this->Debug = FALSE;
+					}
 				}
 				else
 				{
-					$this->Charset = "UTF8";
+					$this->Server = DB_HOST;
+					$this->User = DB_USER;
+					$this->Password = DB_PASS;
+					$this->Database = DB_NAME;
+					$this->Connection_Type = DB_TYPE;
+					
+					if(defined("DB_CHARSET"))
+					{
+						$this->Charset = DB_CHARSET;
+					}
+					else
+					{
+						$this->Charset = "UTF8";
+					}
+					
+					if(defined("TRANSACTION_MODE"))
+					{
+						$this->TransactionMode = TRANSACTION_MODE;
+					}
+					else
+					{
+						$this->TransactionMode = FALSE;
+					}
+					
+					if(defined("SQL_DEBUG"))
+					{
+						$this->Debug = TRUE;
+					}
+					else
+					{
+						$this->Debug = FALSE;
+					}
 				}
-
-				if(defined("TRANSACTION_MODE"))
-				{
-					$this->TransactionMode = TRANSACTION_MODE;
-				}
-				else
-				{
-					$this->TransactionMode = FALSE;
-				}
-
-				if(defined("SQL_DEBUG"))
-				{
-					$this->Debug = TRUE;
-				}
-				else
-				{
-					$this->Debug = FALSE;
-				}
-				
 				$this->sql_connect();
 			}
 			else 
@@ -131,22 +168,17 @@ class sql
 
 		return $rows[$rowid][$field];
 	}
-	
 
 	/**
-	 * @return rows count
-	 */
-	function sql_num_rows($statement)
-	{	
-		if (method_exists($statement,"rowCount"))
-		{
-			return $statement->rowCount();
-		}
-		else
-		{
-			return NULL;
-		}
-	}
+	  * @return rows count
+	  */
+	 function sql_num_rows($statement)
+	 { 
+		  if (method_exists($statement,'rowCount'))
+		   return ($statement->rowCount());
+		  else
+		   return 0;
+	 }
 	
 	/**
 	 * @return fields count

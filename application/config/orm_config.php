@@ -48,6 +48,19 @@ $intotheset = "if (method_exists(get_class($"."this),'set_Version'))
                     $"."this->structure['LMD'][3]=1;
                     $"."this->structure['LMD'][4]=$"."this->LMD;
                 }
+                if (method_exists(get_class($"."this),'set_ID_LM'))
+                {
+                    $"."this->LMD = date('Y-m-d H:i:s');
+                    $"."this->structure['ID_LM'][3]=1;
+                    if(isset(\$_SESSION[\"ID_Entity\"]))
+                    {
+                        \$this->structure['ID_LM'][4]=\$_SESSION[\"ID_Entity\"];
+                    }
+                    else
+                    {
+                        \$this->structure['ID_LM'][4]=0;
+                    }
+                }
                 if ($"."this->isNew==1)
                 {
                     if (method_exists(get_class($"."this),'set_CDate'))
@@ -55,6 +68,19 @@ $intotheset = "if (method_exists(get_class($"."this),'set_Version'))
                         $"."this->CDate = date('Y-m-d H:i:s');
                         $"."this->structure['CDate'][3]=1;
                         $"."this->structure['CDate'][4]=$"."this->CDate;
+                    }
+                    if (method_exists(get_class($"."this),'set_ID_C'))
+                    {
+                        $"."this->ID_C = date('Y-m-d H:i:s');
+                        $"."this->structure['ID_C'][3]=1;
+                        if(isset(\$_SESSION[\"ID_Entity\"]))
+                        {
+                            \$this->structure['ID_C'][4]=\$_SESSION[\"ID_Entity\"];
+                        }
+                        else
+                        {
+                            \$this->structure['ID_C'][4]=0;
+                        }
                     }
                 }
 ";
