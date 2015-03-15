@@ -309,14 +309,7 @@ class $class extends Common
 	{
 	    if ( is_callable( array($"."this,'get_'.(string)$"."property) ) )
 	    {
-	        $result = call_user_func( array($"."this,'get_'.(string)$"."property) );
-
-	        if(is_string($result))
-	        {
-				$result = htmlentities($result);
-	        }
-
-	        return $result;
+	        return call_user_func( array($"."this,'get_'.(string)$"."property) );
 	    }
 	    else {
 	        throw new DALException(\"get for \".$"."property.\" doesn't exists\");
@@ -399,7 +392,7 @@ class $class extends Common
 		$col=$row->Field;
 		$c.="public function get_".$col."()
 	{
-		return $"."this->".$col.";
+		return htmlentities($"."this->".$col.");
 	}
 	
 	";
